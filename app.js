@@ -2,7 +2,22 @@ const SUPABASE_URL = 'https://zmjjptofhvwxkazqfhxi.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptampwdG9maHZ3eGthenFmaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NDk4NTMsImV4cCI6MjA5OTAyNTg1M30.1Zek0nY55-I3VtcGfG5oMdnw9YqgHyf7Syydx8S3hQQ';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── Show a toast notification ─────────────────────────────────────
+// ── Gather table data (defined here so it works regardless of load order) ──
+function gatherSection(tbodyId, c1, c2) {
+  var rows = [];
+  document.querySelectorAll('#' + tbodyId + ' tr').forEach(function(tr) {
+    var row = { src: tr.dataset.source };
+    row[c1] = tr.querySelector('[data-field="' + c1 + '"]').value;
+    row[c2] = tr.querySelector('[data-field="' + c2 + '"]').value;
+    ['yearly','monthly','fortnightly','weekly'].forEach(function(p) {
+      row[p] = tr.querySelector('[data-period="' + p + '"]').value;
+    });
+    rows.push(row);
+  });
+  return rows;
+}
+
+// ── Toast notification ────────────────────────────────────────────
 function showToast(msg, type) {
   var existing = document.getElementById('sb-toast');
   if (existing) existing.remove();
@@ -22,18 +37,15 @@ function showToast(msg, type) {
   setTimeout(function() { t.remove(); }, 3500);
 }
 
-// ── Check auth on page load ───────────────────────────────────────
+// ── Check auth ────────────────────────────────────────────────────
 async function checkAuth() {
   const { data } = await sb.auth.getSession();
-  if (!data.session) {
-    window.location.href = 'auth.html';
-    return;
-  }
+  if (!data.session) { window.location.href = 'auth.html'; return; }
   const el = document.getElementById('user-email');
   if (el) el.textContent = data.session.user.email;
 }
 
-// ── Save budget to Supabase ───────────────────────────────────────
+// ── Save ──────────────────────────────────────────────────────────
 async function saveToCloud() {
   try {
     const { data: { user }, error: userErr } = await sb.auth.getUser();
@@ -45,88 +57,77 @@ async function saveToCloud() {
     const date  = now.getFullYear() + '-'
       + String(now.getMonth()+1).padStart(2,'0') + '-'
       + String(now.getDate()).padStart(2,'0');
-    const budgetName = (last || first || 'Budget') + ' - Budget ' + date;
 
-    const gs = window.gatherSection || gatherSection;
     const budgetData = {
       clientFirst: first,
       clientLast:  last,
-      income:  gs('income-tbody',  'name',     'type'),
-      expense: gs('expense-tbody', 'category', 'expense')
+      income:  gatherSection('income-tbody',  'name',     'type'),
+      expense: gatherSection('expense-tbody', 'category', 'expense')
     };
 
-    // Check if record already exists for this user
     const { data: existing, error: fetchErr } = await sb
-      .from('budgets')
-      .select('id')
-      .eq('user_id', user.id)
-      .limit(1);
-
+      .from('budgets').select('id').eq('user_id', user.id).limit(1);
     if (fetchErr) { showToast('Save failed: ' + fetchErr.message, 'error'); return; }
 
     let saveErr;
     if (existing && existing.length > 0) {
-      const { error } = await sb.from('budgets').update({
-        name:       budgetName,
-        data:       budgetData,
+      ({ error: saveErr } = await sb.from('budgets').update({
+        name: (last || first || 'Budget') + ' - Budget ' + date,
+        data: budgetData,
         updated_at: new Date().toISOString()
-      }).eq('id', existing[0].id);
-      saveErr = error;
+      }).eq('id', existing[0].id));
     } else {
-      const { error } = await sb.from('budgets').insert({
-        user_id:    user.id,
-        name:       budgetName,
-        data:       budgetData,
+      ({ error: saveErr } = await sb.from('budgets').insert({
+        user_id: user.id,
+        name: (last || first || 'Budget') + ' - Budget ' + date,
+        data: budgetData,
         updated_at: new Date().toISOString()
-      });
-      saveErr = error;
+      }));
     }
 
     if (saveErr) { showToast('Save failed: ' + saveErr.message, 'error'); return; }
     showToast('✓ Budget saved successfully!', 'success');
 
-  } catch(e) {
-    showToast('Unexpected error: ' + e.message, 'error');
-  }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
-// ── Load budget from Supabase ─────────────────────────────────────
+// ── Load ──────────────────────────────────────────────────────────
 async function loadFromCloud() {
   try {
     const { data: { user }, error: userErr } = await sb.auth.getUser();
     if (userErr || !user) { showToast('Not logged in — please refresh.', 'error'); return; }
 
-    const { data, error } = await sb
-      .from('budgets')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false });
-
-    if (error) { showToast('Load failed: ' + error.message, 'error'); return; }
-    if (!data || !data.length) { showToast('No saved budget found for your account.', 'error'); return; }
+    const { data, error } = await sb.from('budgets').select('*')
+      .eq('user_id', user.id).order('updated_at', { ascending: false });
+    if (error)             { showToast('Load failed: ' + error.message, 'error'); return; }
+    if (!data || !data.length) { showToast('No saved budget found.', 'error'); return; }
 
     const d = data[0].data;
     document.getElementById('income-tbody').innerHTML  = '';
     document.getElementById('expense-tbody').innerHTML = '';
-    document.getElementById('client-first').value = d.clientFirst || '';
-    document.getElementById('client-last').value  = d.clientLast  || '';
-    if (typeof updateDocTitle === 'function') updateDocTitle();
+    if (document.getElementById('client-first')) document.getElementById('client-first').value = d.clientFirst || '';
+    if (document.getElementById('client-last'))  document.getElementById('client-last').value  = d.clientLast  || '';
+
+    // Use window functions with fallback — they may now be defined
+    const air = window.addIncomeRow  || function(s){ console.warn('addIncomeRow not ready', s); };
+    const aer = window.addExpenseRow || function(s){ console.warn('addExpenseRow not ready', s); };
+    const ua  = window.updateAll     || function(){};
+    const udt = window.updateDocTitle || function(){};
+
     (d.income  || []).forEach(function(r) {
       const s = { name: r.name||'', type: r.type||'' };
       if (r.src && r[r.src] !== '') s[r.src] = r[r.src];
-      addIncomeRow(s);
+      air(s);
     });
     (d.expense || []).forEach(function(r) {
       const s = { category: r.category||'', expense: r.expense||'' };
       if (r.src && r[r.src] !== '') s[r.src] = r[r.src];
-      addExpenseRow(s);
+      aer(s);
     });
-    if (typeof updateAll === 'function') updateAll();
-    showToast('✓ Budget loaded — ' + data[0].name, 'success');
+    ua(); udt();
+    showToast('✓ Loaded — ' + data[0].name, 'success');
 
-  } catch(e) {
-    showToast('Unexpected error: ' + e.message, 'error');
-  }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
 // ── Sign out ──────────────────────────────────────────────────────
@@ -135,6 +136,9 @@ async function signOut() {
   window.location.href = 'auth.html';
 }
 
-// ── Run on page load ──────────────────────────────────────────────
-// Scripts load after DOM so call directly
-checkAuth();
+// ── Init — wait for DOM then check auth ───────────────────────────
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', checkAuth);
+} else {
+  checkAuth();
+}
