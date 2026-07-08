@@ -358,10 +358,11 @@ canvas.pie { display: block; }
       <h1>budget<span>.</span></h1>
       <div class="sub">Income &amp; Expense Planner</div>
     </div>
-    <div class="btn-row">
-      <button class="btn green" onclick="saveToCloud()">☁ Save</button>
-<button class="btn teal"  onclick="loadFromCloud()">☁ Load</button>
-<button class="btn"       onclick="signOut()">Sign Out</button>
+    <div class="btn-row" style="align-items:center;gap:12px;">
+      <span id="user-email" style="font-size:0.72rem;color:#94a3b8;"></span>
+      <button class="btn green" onclick="saveToCloud()">&#9729; Save</button>
+      <button class="btn teal"  onclick="loadFromCloud()">&#9729; Load</button>
+      <button class="btn red"   onclick="signOut()">Sign Out</button>
     </div>
   </div>
 </header>
