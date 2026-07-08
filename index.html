@@ -1,8 +1,9 @@
-﻿<!DOCTYPE html>
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mr &amp; Mrs Example — Budget</title>
+<title>Budget Planner</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -356,10 +357,11 @@ canvas.pie { display: block; }
       <h1>budget<span>.</span></h1>
       <div class="sub">Income &amp; Expense Planner</div>
     </div>
-    <div class="btn-row">
-      <button class="btn green" onclick="saveToCloud()">☁ Save</button>
-<button class="btn teal"  onclick="loadFromCloud()">☁ Load</button>
-<button class="btn"       onclick="signOut()">Sign Out</button>
+    <div class="btn-row" style="align-items:center;gap:12px;">
+      <span id="user-email" style="font-size:0.72rem;color:#94a3b8;"></span>
+      <button class="btn green" onclick="saveToCloud()">&#9729; Save</button>
+      <button class="btn teal"  onclick="loadFromCloud()">&#9729; Load</button>
+      <button class="btn red"   onclick="signOut()">Sign Out</button>
     </div>
   </div>
 </header>
@@ -369,7 +371,7 @@ canvas.pie { display: block; }
   <span class="client-bar-label">Client</span>
   <span class="client-name-divider">|</span>
   <input class="client-name-input" id="client-first" type="text" placeholder="First name" maxlength="40" oninput="updateDocTitle()">
-  <input class="client-name-input" id="client-last" type="text" placeholder="Last name" maxlength="40" oninput="updateDocTitle()">
+  <input class="client-name-input" id="client-last"  type="text" placeholder="Last name"  maxlength="40" oninput="updateDocTitle()">
 </div>
 
 <div class="app-body">
@@ -386,10 +388,10 @@ canvas.pie { display: block; }
 <!-- Net Bar -->
 <div class="net-bar">
   <div class="net-bar-title">Net Position — Income minus Expenses</div>
-  <div class="net-item"><span class="net-item-label">Yearly</span><span class="net-item-val positive" id="net-yearly">+$65,040</span></div>
-  <div class="net-item"><span class="net-item-label">Monthly</span><span class="net-item-val positive" id="net-monthly">+$5,420</span></div>
-  <div class="net-item"><span class="net-item-label">Fortnightly</span><span class="net-item-val positive" id="net-fortnightly">+$2,500</span></div>
-  <div class="net-item"><span class="net-item-label">Weekly</span><span class="net-item-val positive" id="net-weekly">+$1,251</span></div>
+  <div class="net-item"><span class="net-item-label">Yearly</span><span class="net-item-val neutral" id="net-yearly">—</span></div>
+  <div class="net-item"><span class="net-item-label">Monthly</span><span class="net-item-val neutral" id="net-monthly">—</span></div>
+  <div class="net-item"><span class="net-item-label">Fortnightly</span><span class="net-item-val neutral" id="net-fortnightly">—</span></div>
+  <div class="net-item"><span class="net-item-label">Weekly</span><span class="net-item-val neutral" id="net-weekly">—</span></div>
 </div>
 
 <!-- Two column layout -->
@@ -399,10 +401,10 @@ canvas.pie { display: block; }
   <div class="col-left">
     <div class="section">
       <div class="section-header">
-        <div class="section-title expense-title">▼ Expenses</div>
+        <div class="section-title expense-title">&#9660; Expenses</div>
         <div class="section-btns">
           <button class="btn green" onclick="addExpenseRow()">+ Add Expense</button>
-          <button class="btn red" onclick="clearSection('expense')">Clear</button>
+          <button class="btn red"   onclick="clearSection('expense')">Clear</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -422,10 +424,10 @@ canvas.pie { display: block; }
           <tfoot class="expense-tfoot">
             <tr>
               <td colspan="2" class="total-label">Total Expenses</td>
-              <td class="total-val" id="et-yearly">$186,160</td>
-              <td class="total-val" id="et-monthly">$15,513</td>
-              <td class="total-val" id="et-fortnightly">$7,161</td>
-              <td class="total-val" id="et-weekly">$3,580</td>
+              <td class="total-val" id="et-yearly">—</td>
+              <td class="total-val" id="et-monthly">—</td>
+              <td class="total-val" id="et-fortnightly">—</td>
+              <td class="total-val" id="et-weekly">—</td>
               <td></td>
             </tr>
           </tfoot>
@@ -440,7 +442,7 @@ canvas.pie { display: block; }
     <div class="section">
       <div class="section-header">
         <div>
-          <div class="section-title income-title">▲ Income</div>
+          <div class="section-title income-title">&#9650; Income</div>
           <div style="margin-top:4px;font-size:0.62rem;color:var(--text3);line-height:1.5;">
             Salary / Wage — use <strong style="color:var(--text2);">NETT</strong> figure &nbsp;·&nbsp;
             Investment income — use <strong style="color:var(--text2);">GROSS</strong> figure
@@ -448,7 +450,7 @@ canvas.pie { display: block; }
         </div>
         <div class="section-btns">
           <button class="btn teal" onclick="addIncomeRow()">+ Add Income</button>
-          <button class="btn red" onclick="clearSection('income')">Clear</button>
+          <button class="btn red"  onclick="clearSection('income')">Clear</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -468,18 +470,18 @@ canvas.pie { display: block; }
           <tfoot class="income-tfoot">
             <tr>
               <td colspan="2" class="total-label">Total Income</td>
-              <td class="total-val" id="it-yearly">$251,200</td>
-              <td class="total-val" id="it-monthly">$20,933</td>
-              <td class="total-val" id="it-fortnightly">$9,661</td>
-              <td class="total-val" id="it-weekly">$4,831</td>
+              <td class="total-val" id="it-yearly">—</td>
+              <td class="total-val" id="it-monthly">—</td>
+              <td class="total-val" id="it-fortnightly">—</td>
+              <td class="total-val" id="it-weekly">—</td>
               <td></td>
             </tr>
             <tr class="surplus-row" id="surplus-row">
               <td colspan="2" class="total-label" style="color:var(--text3);font-size:0.6rem;">Surplus / Deficit</td>
-              <td class="total-val surplus-positive" id="sur-yearly">+$65,040</td>
-              <td class="total-val surplus-positive" id="sur-monthly">+$5,420</td>
-              <td class="total-val surplus-positive" id="sur-fortnightly">+$2,500</td>
-              <td class="total-val surplus-positive" id="sur-weekly">+$1,251</td>
+              <td class="total-val" id="sur-yearly">—</td>
+              <td class="total-val" id="sur-monthly">—</td>
+              <td class="total-val" id="sur-fortnightly">—</td>
+              <td class="total-val" id="sur-weekly">—</td>
               <td></td>
             </tr>
           </tfoot>
@@ -492,12 +494,12 @@ canvas.pie { display: block; }
       <div class="chart-box">
         <div class="chart-title income-ct">Income Breakdown</div>
         <canvas class="pie" id="income-pie" width="160" height="160"></canvas>
-        <div class="legend" id="income-legend"><div class="no-data-msg">No income data yet</div></div><span class="legend-name">Person 1</span><span class="legend-amt">$150,000</span><span class="legend-pct">60%</span></div><div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div><span class="legend-name">Person 2</span><span class="legend-amt">$70,000</span><span class="legend-pct">28%</span></div><div class="legend-item"><div class="legend-dot" style="background:#0891b2"></div><span class="legend-name">IP - Example</span><span class="legend-amt">$31,200</span><span class="legend-pct">12%</span></div></div>
+        <div class="legend" id="income-legend"><div class="no-data-msg">No income data yet</div></div>
       </div>
       <div class="chart-box">
         <div class="chart-title expense-ct">Expense Breakdown</div>
         <canvas class="pie" id="expense-pie" width="160" height="160"></canvas>
-        <div class="legend" id="expense-legend"><div class="no-data-msg">No expense data yet</div></div><span class="legend-name">Bills - Home</span><span class="legend-amt">$71,760</span><span class="legend-pct">39%</span></div><div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div><span class="legend-name">Emergency</span><span class="legend-amt">$5,200</span><span class="legend-pct">3%</span></div><div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div><span class="legend-name">Entertainment</span><span class="legend-amt">$2,600</span><span class="legend-pct">1%</span></div><div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div><span class="legend-name">Everyday</span><span class="legend-amt">$38,000</span><span class="legend-pct">20%</span></div><div class="legend-item"><div class="legend-dot" style="background:#0891b2"></div><span class="legend-name">Gifts</span><span class="legend-amt">$4,800</span><span class="legend-pct">3%</span></div><div class="legend-item"><div class="legend-dot" style="background:#ea580c"></div><span class="legend-name">Holidays</span><span class="legend-amt">$5,200</span><span class="legend-pct">3%</span></div><div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div><span class="legend-name">IP - Example</span><span class="legend-amt">$58,600</span><span class="legend-pct">31%</span></div></div>
+        <div class="legend" id="expense-legend"><div class="no-data-msg">No expense data yet</div></div>
       </div>
     </div>
   </div>
@@ -512,7 +514,7 @@ canvas.pie { display: block; }
       <div style="font-family:Inter,system-ui,sans-serif;font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">Cash Flow Structure</div>
       <div style="font-size:0.65rem;color:#94a3b8;margin-top:3px;">Diagram updates automatically from your expense categories on the Budget tab</div>
     </div>
-    <button class="btn" onclick="switchTab('budget')">← Back to Budget</button>
+    <button class="btn" onclick="switchTab('budget')">&#8592; Back to Budget</button>
   </div>
   <div id="cashflow-canvas-wrap" style="width:100%;overflow:auto;display:flex;justify-content:center;">
     <canvas id="cashflow-canvas" style="display:block;"></canvas>
@@ -523,7 +525,6 @@ canvas.pie { display: block; }
 <!-- Save: no modal needed, triggers download directly -->
 
 <!-- Load: hidden file input -->
-<input type="file" id="load-file-input" accept=".html" style="display:none" onchange="doLoadFile(event)">
 
 <script>
 var PERIODS = ['yearly','monthly','fortnightly','weekly'];
@@ -810,6 +811,7 @@ function gatherSection(tbodyId, c1, c2) {
     rows.push(row);
   }); return rows;
 }
+// Expose to global scope so app.js can always access these
 window.gatherSection  = gatherSection;
 window.addIncomeRow   = addIncomeRow;
 window.addExpenseRow  = addExpenseRow;
@@ -835,144 +837,11 @@ function getFilename() {
   return surname.toUpperCase() + ' - Budget ' + date + '.html';
 }
 
-// ── Save: download HTML with data baked in ───────────────────────
-function openSave() {
-  var data = {
-    clientFirst: document.getElementById('client-first').value || '',
-    clientLast:  document.getElementById('client-last').value  || '',
-    income:  gatherSection('income-tbody',  'name',     'type'),
-    expense: gatherSection('expense-tbody', 'category', 'expense')
-  };
-  var json = JSON.stringify(data);
-
-  // Reconstruct full HTML from the live DOM:
-  // - doctype + everything before the script tag
-  // - the script tag's own text (always accurate, never stale)
-  // - everything after the script tag
-  var scripts = document.querySelectorAll('script');
-  var mainScript = null;
-  for (var i = 0; i < scripts.length; i++) {
-    if (scripts[i].textContent.indexOf('__BUDGET_DATA_START__') !== -1) {
-      mainScript = scripts[i]; break;
-    }
-  }
-  if (!mainScript) {
-    alert('Could not locate script block. Please re-download the original file.');
-    return;
-  }
-
-  var scriptText = mainScript.textContent;
-  var seedMarker = '/* __BUDGET_DATA_START__ */
-addIncomeRow({});
-addExpenseRow({});
-/* __BUDGET_DATA_END__ */';
-  var si = scriptText.indexOf(seedMarker);
-  var ei = scriptText.indexOf(seedEnd);
-  if (si === -1 || ei === -1) {
-    alert('Could not find data markers. Please re-download the original file.');
-    return;
-  }
-
-  var newSeedBlock = seedMarker + '\n'
-    + '(function(){\n'
-    + '  var d=' + json + ';\n'
-    + '  document.getElementById("income-tbody").innerHTML="";\n'
-    + '  document.getElementById("expense-tbody").innerHTML="";\n'
-    + '  (d.income||[]).forEach(function(r){var s={name:r.name||"",type:r.type||""};if(r.src&&r[r.src]!=="")s[r.src]=r[r.src];addIncomeRow(s);});\n'
-    + '  (d.expense||[]).forEach(function(r){var s={category:r.category||"",expense:r.expense||""};if(r.src&&r[r.src]!=="")s[r.src]=r[r.src];addExpenseRow(s);});\n'
-    + '  if(d.clientFirst!==undefined)document.getElementById("client-first").value=d.clientFirst;\n'
-    + '  if(d.clientLast!==undefined)document.getElementById("client-last").value=d.clientLast;\n'
-    + '  if(typeof updateDocTitle==="function")updateDocTitle();\n'
-    + '})();\n'
-    + seedEnd;
-
-  var newScriptText = scriptText.slice(0, si) + newSeedBlock + scriptText.slice(ei + seedEnd.length);
-
-  // Rebuild the full HTML document
-  var fullHtml = document.documentElement.outerHTML;
-  var oldScript = '<script>' + scriptText + '<\/script>';
-  // Use placeholder to safely swap script content
-  var newScript = '<script>' + newScriptText + '<\/script>';
-  // Split on the script tag boundaries
-  var scriptStart = fullHtml.indexOf('<script>' + scriptText.slice(0, 40));
-  if (scriptStart === -1) {
-    // Fallback: find script by unique marker
-    scriptStart = fullHtml.indexOf(seedMarker);
-    // Walk back to find opening <script>
-    scriptStart = fullHtml.lastIndexOf('<script>', scriptStart);
-  }
-  var scriptEnd = fullHtml.indexOf('<\/script>', scriptStart) + '<\/script>'.length;
-  var html = '<!DOCTYPE html>\n'
-    + fullHtml.slice(0, scriptStart)
-    + '<script>' + newScriptText + '<\/script>'
-    + fullHtml.slice(scriptEnd);
-
-  var blob = new Blob([html], { type: 'text/html' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = getFilename();
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-// ── Load: read a saved HTML file ──────────────────────────────────
-function openLoad() {
-  document.getElementById('load-file-input').click();
-}
-
-function doLoadFile(evt) {
-  var file = evt.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var html = e.target.result;
-      // Extract JSON from saved seed block
-      var marker = '/* __BUDGET_DATA_START__ */';
-      var endMark = '/* __BUDGET_DATA_END__ */';
-      var si = html.indexOf(marker);
-      var ei = html.indexOf(endMark);
-      if (si === -1) { alert('This file has no saved budget data.'); return; }
-      var block = html.slice(si + marker.length, ei);
-      // Pull the JSON object out: var d={...};
-      var jsonMatch = block.match(/var d=(\{[\s\S]*?\});/);
-      if (!jsonMatch) { alert('Could not read budget data from file.'); return; }
-      var data = JSON.parse(jsonMatch[1]);
-      document.getElementById('income-tbody').innerHTML = '';
-      document.getElementById('expense-tbody').innerHTML = '';
-      if (data.clientFirst !== undefined) document.getElementById('client-first').value = data.clientFirst;
-      if (data.clientLast  !== undefined) document.getElementById('client-last').value  = data.clientLast;
-      updateDocTitle();
-      (data.income||[]).forEach(function(d){
-        var seed={name:d.name||'',type:d.type||''};
-        if(d.src&&d[d.src]!=='') seed[d.src]=d[d.src]; addIncomeRow(seed);
-      });
-      (data.expense||[]).forEach(function(d){
-        var seed={category:d.category||'',expense:d.expense||''};
-        if(d.src&&d[d.src]!=='') seed[d.src]=d[d.src]; addExpenseRow(seed);
-      });
-      updateAll();
-    } catch(err) {
-      alert('Failed to load budget file: ' + err.message);
-    }
-    // Reset so same file can be re-loaded
-    evt.target.value = '';
-  };
-  reader.readAsText(file);
-}
-
-function closeModal(which) { /* no-op, kept for compatibility */ }
+// Save/Load handled by app.js
 
 /* __BUDGET_DATA_START__ */
-// ── Seed data (replaced on Save) ──────────────────────────────────
-addIncomeRow({ name:'John', type:'Salary',    fortnightly:3800 });
-addIncomeRow({ name:'Jane', type:'Salary',    fortnightly:2600 });
-
-addExpenseRow({ category:'Housing',   expense:'Rent / Mortgage',  monthly:2200 });
-addExpenseRow({ category:'Utilities', expense:'Electricity',       monthly:150  });
-addExpenseRow({ category:'Food',      expense:'Groceries',         weekly:200   });
-addExpenseRow({ category:'Transport', expense:'Fuel',              fortnightly:80 });
-addExpenseRow({ category:'Insurance', expense:'Health Insurance',  monthly:120  });
+addIncomeRow({});
+addExpenseRow({});
 /* __BUDGET_DATA_END__ */
 
 // ── Tab switching ─────────────────────────────────────────────────
@@ -1508,11 +1377,12 @@ async function signOut() {
 
 // ── Init — wait for DOM then check auth ───────────────────────────
 if (document.readyState === 'loading') {
-  
+  document.addEventListener('DOMContentLoaded', checkAuth);
 } else {
   checkAuth();
 }
 
 </script>
 </div><!-- end app-body -->
-</body></html>
+</body>
+</html>
