@@ -811,6 +811,12 @@ function gatherSection(tbodyId, c1, c2) {
     rows.push(row);
   }); return rows;
 }
+// Expose to global scope so app.js can always access these
+window.gatherSection  = gatherSection;
+window.addIncomeRow   = addIncomeRow;
+window.addExpenseRow  = addExpenseRow;
+window.updateAll      = updateAll;
+window.updateDocTitle = updateDocTitle;
 
 // ── Client name helpers ──────────────────────────────────────────
 function updateDocTitle() {

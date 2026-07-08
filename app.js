@@ -47,11 +47,12 @@ async function saveToCloud() {
       + String(now.getDate()).padStart(2,'0');
     const budgetName = (last || first || 'Budget') + ' - Budget ' + date;
 
+    const gs = window.gatherSection || gatherSection;
     const budgetData = {
       clientFirst: first,
       clientLast:  last,
-      income:  gatherSection('income-tbody',  'name',     'type'),
-      expense: gatherSection('expense-tbody', 'category', 'expense')
+      income:  gs('income-tbody',  'name',     'type'),
+      expense: gs('expense-tbody', 'category', 'expense')
     };
 
     // Check if record already exists for this user
