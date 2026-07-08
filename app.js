@@ -135,6 +135,5 @@ async function signOut() {
 }
 
 // ── Run on page load ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  checkAuth();
-});
+// Scripts load after DOM so call directly
+checkAuth();
