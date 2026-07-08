@@ -1,66 +1,214 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Budget — Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NWA Budget Tool — Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* match your existing style */
-    body { font-family: Inter, sans-serif; background: #f4f6f9;
-           display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-    .card { background: white; border-radius: 12px; padding: 40px;
-            width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
-    h2 { margin-bottom: 24px; color: #0f172a; }
-    input { width: 100%; padding: 10px 12px; margin-bottom: 12px;
-            border: 1.5px solid #e2e8f0; border-radius: 6px;
-            font-size: 0.9rem; box-sizing: border-box; }
-    button { width: 100%; padding: 11px; background: #2563eb;
-             color: white; border: none; border-radius: 6px;
-             font-weight: 600; cursor: pointer; margin-bottom: 8px; }
-    .toggle { text-align: center; font-size: 0.8rem; color: #64748b; cursor: pointer; }
-    .msg { font-size: 0.75rem; color: #ef4444; margin-bottom: 8px; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #0f2137;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #1db954; }
+    .tagline {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 36px 40px;
+      width: 380px;
+      box-shadow: 0 4px 24px rgba(15,23,42,0.09);
+      border: 1.5px solid #e2e8f0;
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #475569;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 13px;
+      margin-bottom: 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: #2563eb; }
+    .btn-primary {
+      width: 100%;
+      padding: 11px;
+      background: #0f2137;
+      color: white;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #1e3a5f; }
+    .divider {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      margin: 4px 0 12px;
+    }
+    .toggle {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 16px;
+    }
+    .toggle a {
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .toggle a:hover { text-decoration: underline; }
+    .msg {
+      font-size: 0.76rem;
+      padding: 9px 12px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .msg.error   { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; display: block; }
+    .msg.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; display: block; }
+    .powered {
+      margin-top: 28px;
+      font-size: 0.66rem;
+      color: #cbd5e1;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-<div class="card">
-  <h2 id="form-title">Sign In</h2>
-  <div class="msg" id="msg"></div>
-  <input type="email"    id="email"    placeholder="Email address">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="submitForm()">Continue</button>
-  <div class="toggle" onclick="toggleMode()" id="toggle-text">
-    Don't have an account? Sign up
+
+  <div class="logo">budget<span>.</span></div>
+  <div class="tagline">National Wealth Advisory — Client Portal</div>
+
+  <div class="card">
+    <h2 id="form-title">Welcome back</h2>
+    <p class="subtitle" id="form-subtitle">Sign in to access your budget</p>
+
+    <div class="msg" id="msg"></div>
+
+    <label>Email address</label>
+    <input type="email" id="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')submitForm()">
+
+    <label>Password</label>
+    <input type="password" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitForm()">
+
+    <button class="btn-primary" onclick="submitForm()" id="submit-btn">Sign In</button>
+
+    <div class="toggle">
+      <span id="toggle-text">Don't have an account?</span>
+      <a onclick="toggleMode()" id="toggle-link">Sign up</a>
+    </div>
   </div>
-</div>
+
+  <div class="powered">Powered by National Wealth Advisory</div>
+
 <script>
   const SUPABASE_URL = 'https://zmjjptofhvwxkazqfhxi.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptampwdG9maHZ3eGthenFmaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NDk4NTMsImV4cCI6MjA5OTAyNTg1M30.1Zek0nY55-I3VtcGfG5oMdnw9YqgHyf7Syydx8S3hQQ';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   let isSignUp = false;
-
-  async function submitForm() {
-    const email    = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const msg      = document.getElementById('msg');
-    const { error } = isSignUp
-      ? await sb.auth.signUp({ email, password })
-      : await sb.auth.signInWithPassword({ email, password });
-    if (error) { msg.textContent = error.message; return; }
-    if (isSignUp) { msg.style.color='green'; msg.textContent='Check your email to confirm!'; }
-    else window.location.href = 'index.html';
-  }
-
-  function toggleMode() {
-    isSignUp = !isSignUp;
-    document.getElementById('form-title').textContent = isSignUp ? 'Create Account' : 'Sign In';
-    document.getElementById('toggle-text').textContent = isSignUp
-      ? 'Already have an account? Sign in'
-      : "Don't have an account? Sign up";
-  }
 
   // Already logged in? Go straight to app
   sb.auth.getSession().then(({ data }) => {
     if (data.session) window.location.href = 'index.html';
   });
+
+  async function submitForm() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const msg      = document.getElementById('msg');
+    const btn      = document.getElementById('submit-btn');
+
+    msg.className = 'msg';
+    if (!email || !password) {
+      msg.textContent = 'Please enter your email and password.';
+      msg.className = 'msg error';
+      return;
+    }
+
+    btn.textContent = 'Please wait...';
+    btn.disabled = true;
+
+    const { error } = isSignUp
+      ? await sb.auth.signUp({ email, password })
+      : await sb.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false;
+    btn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+
+    if (error) {
+      msg.textContent = error.message;
+      msg.className = 'msg error';
+      return;
+    }
+
+    if (isSignUp) {
+      msg.textContent = 'Account created! Check your email to confirm before signing in.';
+      msg.className = 'msg success';
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+
+  function toggleMode() {
+    isSignUp = !isSignUp;
+    document.getElementById('form-title').textContent    = isSignUp ? 'Create an account' : 'Welcome back';
+    document.getElementById('form-subtitle').textContent = isSignUp ? 'Start managing your budget today' : 'Sign in to access your budget';
+    document.getElementById('submit-btn').textContent    = isSignUp ? 'Create Account' : 'Sign In';
+    document.getElementById('toggle-text').textContent   = isSignUp ? 'Already have an account?' : "Don't have an account?";
+    document.getElementById('toggle-link').textContent   = isSignUp ? 'Sign in' : 'Sign up';
+    document.getElementById('msg').className = 'msg';
+  }
 </script>
 </body>
 </html>

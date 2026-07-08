@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Planner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f4f6f9;
+  --surface:   #ffffff;
+  --surface2:  #f0f4f8;
+  --border:    #e2e8f0;
+  --border2:   #cbd5e1;
+  --navy:      #0f2137;
+  --navy2:     #1e3a5f;
+  --text:      #1e293b;
+  --text2:     #475569;
+  --text3:     #94a3b8;
+  --green:     #1db954;
+  --green-bg:  #e8f8ee;
+  --blue:      #2563eb;
+  --blue-bg:   #eff6ff;
+  --red:       #ef4444;
+  --red-bg:    #fef2f2;
+  --amber:     #f59e0b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* App shell */
+.app-header {
+  background: var(--navy);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+}
+
+.app-body { padding: 24px 28px; }
+
+h1 {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  color: #fff;
+}
+h1 span { color: #1db954; }
+
+.sub { font-size: 0.65rem; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+
+/* Top bar inside header */
+.top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Tab nav */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  margin-top: 0;
+  background: var(--surface);
+  padding: 0 28px;
+  margin-left: -28px;
+  margin-right: -28px;
+}
+.tab {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  padding: 14px 20px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Buttons */
+button.btn {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+button.btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+button.btn.green  { background: var(--green); border-color: var(--green); color: #fff; }
+button.btn.green:hover { background: #17a347; }
+button.btn.teal   { background: var(--blue); border-color: var(--blue); color: #fff; }
+button.btn.teal:hover { background: #1d4ed8; }
+button.btn.red    { background: var(--red); border-color: var(--red); color: #fff; }
+button.btn.red:hover  { background: #dc2626; }
+
+/* Section buttons (inside page, not header) */
+.section-btns button.btn {
+  background: transparent;
+  color: var(--text2);
+  border-color: var(--border2);
+}
+.section-btns button.btn:hover { border-color: var(--blue); color: var(--blue); }
+.section-btns button.btn.green  { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+.section-btns button.btn.green:hover { background: #d1f5de; }
+.section-btns button.btn.teal   { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+.section-btns button.btn.teal:hover { background: #dbeafe; }
+.section-btns button.btn.red    { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+.section-btns button.btn.red:hover  { background: #fee2e2; }
+
+/* Net bar */
+.net-bar {
+  background: var(--navy);
+  border: none;
+  border-radius: 10px;
+  padding: 16px 22px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 36px;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(15,33,55,0.12);
+}
+.net-bar-title {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.net-item { display: flex; flex-direction: column; gap: 2px; }
+.net-item-label { font-size: 0.6rem; color: #64748b; letter-spacing: 0.08em; text-transform: uppercase; }
+.net-item-val { font-size: 1rem; font-weight: 700; font-family: 'Inter', system-ui, sans-serif; }
+.net-item-val.positive { color: #4ade80; }
+.net-item-val.negative { color: #f87171; }
+.net-item-val.neutral  { color: #64748b; }
+
+/* Two-column layout */
+.columns { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.col-left  { flex: 1 1 520px; min-width: 0; }
+.col-right { flex: 1 1 400px; min-width: 0; }
+
+/* Section */
+.section { margin-bottom: 24px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.section-title { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.section-title.income-title  { color: var(--green); }
+.section-title.expense-title { color: var(--blue); }
+.section-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1.5px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+table { width: 100%; border-collapse: collapse; min-width: 520px; background: var(--surface); }
+
+thead th {
+  background: var(--surface2);
+  padding: 10px 12px;
+  font-size: 0.65rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: left;
+  border-bottom: 1.5px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+thead th.sortable { cursor: pointer; }
+thead th.sortable:hover { color: var(--blue); }
+
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f8fafc; }
+td { padding: 0; }
+
+td input[type="text"], td input[type="number"] {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.82rem;
+  padding: 10px 12px;
+  outline: none;
+}
+td input[type="number"] { text-align: right; -moz-appearance: textfield; }
+td input[type="number"]::-webkit-inner-spin-button,
+td input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+td input.calc      { color: var(--blue); font-weight: 500; }
+td input.empty-num { color: var(--text3); }
+
+td.del-cell { text-align: center; }
+td.del-cell button { background: none; border: none; color: var(--text3); font-size: 1rem; cursor: pointer; padding: 7px 9px; }
+td.del-cell button:hover { color: var(--red); }
+
+/* Totals footers */
+.income-tfoot tr  { background: var(--green-bg); border-top: 2px solid var(--green); }
+.income-tfoot td  { padding: 10px 12px; font-family: 'Inter', system-ui, sans-serif; font-weight: 700; color: var(--green); font-size: 0.8rem; }
+.income-tfoot .surplus-row { background: var(--surface2); border-top: 1px dashed var(--border2); }
+.income-tfoot .surplus-row td { font-size: 0.78rem; }
+.surplus-positive { color: var(--green) !important; }
+.surplus-negative { color: var(--red) !important; }
+.surplus-neutral  { color: var(--text3) !important; }
+.expense-tfoot tr { background: var(--blue-bg); border-top: 2px solid var(--blue); }
+.expense-tfoot td { padding: 10px 12px; font-family: 'Inter', system-ui, sans-serif; font-weight: 700; color: var(--blue); font-size: 0.8rem; }
+.total-label { font-size: 0.65rem; letter-spacing: 0.07em; text-transform: uppercase; }
+.total-val   { text-align: right; }
+
+/* Charts */
+.charts-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+.chart-box {
+  flex: 1 1 200px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.chart-title { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; align-self: flex-start; }
+.chart-title.income-ct  { color: var(--green); }
+.chart-title.expense-ct { color: var(--blue); }
+canvas.pie { display: block; }
+#cashflow-canvas { border-radius: 12px; box-shadow: 0 4px 24px rgba(15,23,42,0.08); }
+.legend { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { flex: 1; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-amt  { color: var(--text); font-size: 0.68rem; font-weight: 600; min-width: 62px; text-align: right; }
+.legend-pct  { color: var(--text3); font-size: 0.66rem; font-weight: 600; min-width: 34px; text-align: right; }
+.no-data-msg { font-size: 0.72rem; color: var(--text3); text-align: center; padding: 20px 0; }
+
+.hint { font-size: 0.65rem; color: var(--text3); margin-top: 8px; }
+
+/* Cash flow page back button */
+#page-page2 button.btn {
+  background: var(--blue-bg);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+#page-page2 button.btn:hover { background: #dbeafe; }
+
+/* Modals */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(15,33,55,0.6); align-items: center; justify-content: center; z-index: 1000; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 28px; width: min(460px, 90vw); box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+.modal h2 { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 8px; color: var(--text); }
+.modal p  { font-size: 0.74rem; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+.modal textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--blue); font-family: 'Inter', monospace; font-size: 0.68rem; padding: 10px; border-radius: 6px; resize: none; height: 90px; outline: none; display: block; margin-bottom: 12px; }
+.modal textarea.input-area { color: var(--text); }
+.modal textarea.error { border-color: var(--red); }
+.modal .modal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.err-msg { color: var(--red); font-size: 0.72rem; margin-bottom: 8px; display: none; }
+
+/* Client name bar */
+.client-bar {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--border);
+  padding: 8px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.client-bar-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.client-name-input {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  outline: none;
+  padding: 2px 4px;
+  min-width: 200px;
+  transition: border-color 0.15s;
+}
+.client-name-input:hover  { border-bottom-color: var(--border2); }
+.client-name-input:focus  { border-bottom-color: var(--blue); }
+.client-name-input::placeholder { color: var(--text3); font-weight: 400; }
+.client-name-divider { color: var(--border2); font-size: 1rem; }
+
+/* Chart tabs */
+.chart-tabs { display: flex; gap: 0; border-bottom: 1.5px solid var(--border); margin-bottom: 12px; width: 100%; }
+.chart-tab {
+  font-family: 'Inter', system-ui, sans-serif; font-size: 0.65rem; font-weight: 600;
+  padding: 6px 12px; border: none; background: transparent; cursor: pointer;
+  color: var(--text3); border-bottom: 2px solid transparent; margin-bottom: -1.5px;
+  transition: color 0.12s, border-color 0.12s; white-space: nowrap;
+}
+.chart-tab:hover { color: var(--text2); }
+.chart-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* Expense list view */
+.exp-list { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.exp-list-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.exp-list-item:last-child { border-bottom: none; }
+.exp-list-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.exp-list-name { flex: 1; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-list-amt  { color: var(--text); font-weight: 600; min-width: 64px; text-align: right; }
+.exp-list-pct  { color: var(--text3); font-size: 0.65rem; font-weight: 600; min-width: 36px; text-align: right; }
+.exp-list-bar-wrap { width: 60px; background: var(--border); border-radius: 3px; height: 4px; }
+.exp-list-bar { height: 4px; border-radius: 3px; }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="top-bar">
+    <div>
+      <h1>budget<span>.</span></h1>
+      <div class="sub">Income &amp; Expense Planner</div>
+    </div>
+    <div class="btn-row" style="align-items:center;gap:12px;">
+      <span id="user-email" style="font-size:0.72rem;color:#94a3b8;"></span>
+      <button class="btn green" onclick="saveToCloud()">&#9729; Save</button>
+      <button class="btn teal"  onclick="loadFromCloud()">&#9729; Load</button>
+      <button class="btn red"   onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<!-- Client name bar -->
+<div class="client-bar">
+  <span class="client-bar-label">Client</span>
+  <span class="client-name-divider">|</span>
+  <input class="client-name-input" id="client-first" type="text" placeholder="First name" maxlength="40" oninput="updateDocTitle()">
+  <input class="client-name-input" id="client-last"  type="text" placeholder="Last name"  maxlength="40" oninput="updateDocTitle()">
+</div>
+
+<div class="app-body">
+
+<!-- Tab navigation -->
+<div class="tab-nav">
+  <button class="tab active" onclick="switchTab('budget')">Budget</button>
+  <button class="tab" onclick="switchTab('page2')" id="tab-page2">Cash Flow Structure</button>
+</div>
+
+<!-- PAGE 1: Budget -->
+<div class="page active" id="page-budget">
+
+<!-- Net Bar -->
+<div class="net-bar">
+  <div class="net-bar-title">Net Position — Income minus Expenses</div>
+  <div class="net-item"><span class="net-item-label">Yearly</span><span class="net-item-val neutral" id="net-yearly">—</span></div>
+  <div class="net-item"><span class="net-item-label">Monthly</span><span class="net-item-val neutral" id="net-monthly">—</span></div>
+  <div class="net-item"><span class="net-item-label">Fortnightly</span><span class="net-item-val neutral" id="net-fortnightly">—</span></div>
+  <div class="net-item"><span class="net-item-label">Weekly</span><span class="net-item-val neutral" id="net-weekly">—</span></div>
+</div>
+
+<!-- Two column layout -->
+<div class="columns">
+
+  <!-- LEFT: Expenses -->
+  <div class="col-left">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title expense-title">&#9660; Expenses</div>
+        <div class="section-btns">
+          <button class="btn green" onclick="addExpenseRow()">+ Add Expense</button>
+          <button class="btn red"   onclick="clearSection('expense')">Clear</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" style="min-width:110px" onclick="sortSection('expense','category')">Category <span id="esa-category"></span></th>
+              <th style="min-width:130px">Expense</th>
+              <th style="min-width:88px;text-align:right">Yearly</th>
+              <th style="min-width:88px;text-align:right">Monthly</th>
+              <th style="min-width:98px;text-align:right">Fortnightly</th>
+              <th style="min-width:80px;text-align:right">Weekly</th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="expense-tbody"></tbody>
+          <tfoot class="expense-tfoot">
+            <tr>
+              <td colspan="2" class="total-label">Total Expenses</td>
+              <td class="total-val" id="et-yearly">—</td>
+              <td class="total-val" id="et-monthly">—</td>
+              <td class="total-val" id="et-fortnightly">—</td>
+              <td class="total-val" id="et-weekly">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="hint">Type in any time period to auto-calculate the others. Teal = calculated.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: Income + both pie charts -->
+  <div class="col-right">
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title income-title">&#9650; Income</div>
+          <div style="margin-top:4px;font-size:0.62rem;color:var(--text3);line-height:1.5;">
+            Salary / Wage — use <strong style="color:var(--text2);">NETT</strong> figure &nbsp;·&nbsp;
+            Investment income — use <strong style="color:var(--text2);">GROSS</strong> figure
+          </div>
+        </div>
+        <div class="section-btns">
+          <button class="btn teal" onclick="addIncomeRow()">+ Add Income</button>
+          <button class="btn red"  onclick="clearSection('income')">Clear</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" style="min-width:100px" onclick="sortSection('income','name')">Name <span id="isa-name"></span></th>
+              <th style="min-width:110px">Type</th>
+              <th style="min-width:80px;text-align:right">Yearly</th>
+              <th style="min-width:80px;text-align:right">Monthly</th>
+              <th style="min-width:90px;text-align:right">Fortnightly</th>
+              <th style="min-width:72px;text-align:right">Weekly</th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="income-tbody"></tbody>
+          <tfoot class="income-tfoot">
+            <tr>
+              <td colspan="2" class="total-label">Total Income</td>
+              <td class="total-val" id="it-yearly">—</td>
+              <td class="total-val" id="it-monthly">—</td>
+              <td class="total-val" id="it-fortnightly">—</td>
+              <td class="total-val" id="it-weekly">—</td>
+              <td></td>
+            </tr>
+            <tr class="surplus-row" id="surplus-row">
+              <td colspan="2" class="total-label" style="color:var(--text3);font-size:0.6rem;">Surplus / Deficit</td>
+              <td class="total-val" id="sur-yearly">—</td>
+              <td class="total-val" id="sur-monthly">—</td>
+              <td class="total-val" id="sur-fortnightly">—</td>
+              <td class="total-val" id="sur-weekly">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Both pie charts side by side -->
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title income-ct">Income Breakdown</div>
+        <canvas class="pie" id="income-pie" width="160" height="160"></canvas>
+        <div class="legend" id="income-legend"><div class="no-data-msg">No income data yet</div></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title expense-ct">Expense Breakdown</div>
+        <canvas class="pie" id="expense-pie" width="160" height="160"></canvas>
+        <div class="legend" id="expense-legend"><div class="no-data-msg">No expense data yet</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end page-budget -->
+
+<!-- PAGE 2: Cash Flow Structure -->
+<div class="page" id="page-page2">
+  <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-family:Inter,system-ui,sans-serif;font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#2563eb;">Cash Flow Structure</div>
+      <div style="font-size:0.65rem;color:#94a3b8;margin-top:3px;">Diagram updates automatically from your expense categories on the Budget tab</div>
+    </div>
+    <button class="btn" onclick="switchTab('budget')">&#8592; Back to Budget</button>
+  </div>
+  <div id="cashflow-canvas-wrap" style="width:100%;overflow:auto;display:flex;justify-content:center;">
+    <canvas id="cashflow-canvas" style="display:block;"></canvas>
+  </div>
+</div>
+
+<!-- Save Modal -->
+<!-- Save: no modal needed, triggers download directly -->
+
+<!-- Load: hidden file input -->
+
+<script>
+var PERIODS = ['yearly','monthly','fortnightly','weekly'];
+var ANNUAL  = { yearly:1, monthly:12, fortnightly:26, weekly:52 };
+var incomeSort  = { col:null, dir:1 };
+var expenseSort = { col:null, dir:1 };
+
+// Palette
+var INCOME_COLORS  = ['#1db954','#2563eb','#0891b2','#16a34a','#6366f1','#0e7490','#15803d','#4338ca'];
+var EXPENSE_COLORS = ['#2563eb','#6366f1','#f59e0b','#ec4899','#0891b2','#ea580c','#16a34a','#7c3aed','#64748b','#0f172a'];
+
+function calcAll(srcField, srcVal) {
+  var annual = parseFloat(srcVal) * ANNUAL[srcField];
+  var out = {};
+  PERIODS.forEach(function(p){ out[p] = Math.round(annual / ANNUAL[p]); });
+  return out;
+}
+
+function fmtMoney(n) { return '$' + Math.round(n).toLocaleString('en-AU'); }
+
+// ── Row builder ───────────────────────────────────────────────────
+function addRow(tbodyId, f1, p1, f2, p2, seed, updateFn) {
+  seed = seed || {};
+  var tr = document.createElement('tr');
+  tr.dataset.source = '';
+  tr.appendChild(makeTextCell(f1, seed[f1]||'', p1));
+  tr.appendChild(makeTextCell(f2, seed[f2]||'', p2));
+  PERIODS.forEach(function(p){ tr.appendChild(makeNumCell(tr, p, updateFn)); });
+  var delTd = document.createElement('td');
+  delTd.className = 'del-cell';
+  var delBtn = document.createElement('button');
+  delBtn.textContent = '\u00D7';
+  delBtn.addEventListener('click', function(){ tr.remove(); updateFn(); });
+  delTd.appendChild(delBtn);
+  tr.appendChild(delTd);
+  document.getElementById(tbodyId).appendChild(tr);
+
+  for (var i = 0; i < PERIODS.length; i++) {
+    var p = PERIODS[i];
+    if (seed[p] != null && seed[p] !== '') {
+      var vals = calcAll(p, seed[p]);
+      tr.dataset.source = p;
+      PERIODS.forEach(function(pp){
+        var inp = tr.querySelector('[data-period="'+pp+'"]');
+        inp.value = vals[pp];
+        inp.className = (pp===p)?'':'calc';
+      });
+      break;
+    }
+  }
+  updateFn();
+  if (!seed[f1]) tr.querySelector('[data-field="'+f1+'"]').focus();
+}
+
+function makeTextCell(field, value, placeholder) {
+  var td = document.createElement('td');
+  var inp = document.createElement('input');
+  inp.type='text'; inp.dataset.field=field; inp.value=value; inp.placeholder=placeholder;
+  td.appendChild(inp); return td;
+}
+
+function makeNumCell(tr, period, updateFn) {
+  var td = document.createElement('td');
+  var inp = document.createElement('input');
+  inp.type='number'; inp.dataset.period=period; inp.min='0'; inp.step='1'; inp.placeholder='0'; inp.className='empty-num';
+  inp.addEventListener('change', function(){
+    var raw=this.value, val=parseFloat(raw);
+    if (raw===''||isNaN(val)) {
+      tr.dataset.source='';
+      PERIODS.forEach(function(p){ var i=tr.querySelector('[data-period="'+p+'"]'); i.value=''; i.className='empty-num'; });
+    } else {
+      tr.dataset.source=period;
+      var vals=calcAll(period,val);
+      PERIODS.forEach(function(p){ var i=tr.querySelector('[data-period="'+p+'"]'); i.value=vals[p]; i.className=(p===period)?'':'calc'; });
+    }
+    updateFn();
+  });
+  td.appendChild(inp); return td;
+}
+
+function addIncomeRow(seed)  { addRow('income-tbody',  'name','Name','type','Type (e.g. Salary)', seed, updateAll); }
+function addExpenseRow(seed) { addRow('expense-tbody', 'category','Category','expense','Description', seed, updateAll); }
+
+// ── Totals & charts ───────────────────────────────────────────────
+function sectionTotals(tbodyId) {
+  var tots={yearly:0,monthly:0,fortnightly:0,weekly:0}, any=false;
+  document.querySelectorAll('#'+tbodyId+' tr').forEach(function(tr){
+    PERIODS.forEach(function(p){
+      var v=parseFloat(tr.querySelector('[data-period="'+p+'"]').value);
+      if (!isNaN(v)){ tots[p]+=v; any=true; }
+    });
+  }); return {tots:tots,any:any};
+}
+
+function getRowsData(tbodyId, labelField) {
+  // Group by label and sum values (e.g. multiple rows with same category)
+  var grouped = {}, order = [];
+  document.querySelectorAll('#'+tbodyId+' tr').forEach(function(tr){
+    var label = tr.querySelector('[data-field="'+labelField+'"]').value.trim() || 'Unnamed';
+    var v = parseFloat(tr.querySelector('[data-period="yearly"]').value);
+    if (!isNaN(v) && v > 0) {
+      if (!grouped[label]) { grouped[label] = 0; order.push(label); }
+      grouped[label] += v;
+    }
+  });
+  return order.map(function(k){ return { label: k, value: grouped[k] }; });
+}
+
+function updateAll() {
+  var inc=sectionTotals('income-tbody'), exp=sectionTotals('expense-tbody');
+  PERIODS.forEach(function(p){
+    document.getElementById('it-'+p).textContent = inc.any ? fmtMoney(inc.tots[p]) : '—';
+    document.getElementById('et-'+p).textContent = exp.any ? fmtMoney(exp.tots[p]) : '—';
+    var netEl=document.getElementById('net-'+p);
+    if (!inc.any && !exp.any) { netEl.textContent='—'; netEl.className='net-item-val neutral'; }
+    else {
+      var net=(inc.tots[p]||0)-(exp.tots[p]||0);
+      netEl.textContent=(net>=0?'+':'')+fmtMoney(net);
+      netEl.className='net-item-val '+(net>0?'positive':net<0?'negative':'neutral');
+    }
+    // Surplus / deficit row
+    var surEl = document.getElementById('sur-'+p);
+    if (surEl) {
+      if (!inc.any && !exp.any) {
+        surEl.textContent = '—';
+        surEl.className = 'total-val surplus-neutral';
+      } else {
+        var sur = (inc.tots[p]||0) - (exp.tots[p]||0);
+        surEl.textContent = (sur >= 0 ? '+' : '') + fmtMoney(sur);
+        surEl.className = 'total-val ' + (sur > 0 ? 'surplus-positive' : sur < 0 ? 'surplus-negative' : 'surplus-neutral');
+      }
+    }
+  });
+  drawPie('income-pie',  'income-legend',  getRowsData('income-tbody','name'),    INCOME_COLORS);
+  drawPie('income-pie',  'income-legend',  getRowsData('income-tbody','name'),     INCOME_COLORS);
+  drawPie('expense-pie', 'expense-legend', getRowsData('expense-tbody','category'), EXPENSE_COLORS);
+}
+
+// ── Pie chart renderer ────────────────────────────────────────────
+function drawPie(canvasId, legendId, items, colors) {
+  var canvas = document.getElementById(canvasId);
+  var legend = document.getElementById(legendId);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (!items.length) {
+    legend.innerHTML = '<div class="no-data-msg">No data yet</div>';
+    return;
+  }
+
+  var total = items.reduce(function(s,d){ return s+d.value; }, 0);
+  var cx=W/2, cy=H/2, r=Math.min(W,H)/2 - 6;
+  var startAngle = -Math.PI/2;
+
+  items.forEach(function(item, i){
+    var slice = (item.value/total) * Math.PI*2;
+    var color = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle+slice);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    // subtle gap
+    ctx.strokeStyle = '#f4f6f9';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    startAngle += slice;
+  });
+
+  // Centre donut hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, r*0.42, 0, Math.PI*2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+
+  // Legend — always show both $ and %
+  var html = '';
+  items.forEach(function(item, i){
+    var pct   = Math.round(item.value / total * 100);
+    var color = colors[i % colors.length];
+    html += '<div class="legend-item">'
+      + '<div class="legend-dot" style="background:'+color+'"></div>'
+      + '<span class="legend-name">'+escHtml(item.label)+'</span>'
+      + '<span class="legend-amt">'+fmtMoney(item.value)+'</span>'
+      + '<span class="legend-pct">'+pct+'%</span>'
+      + '</div>';
+  });
+  legend.innerHTML = html;
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Expense chart tabs ────────────────────────────────────────────
+var expTabMode = 'category-pct';
+
+function setExpTab(mode, btn) {
+  expTabMode = mode;
+  document.querySelectorAll('#exp-chart-tabs .chart-tab').forEach(function(t){ t.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  drawPie('income-pie',  'income-legend',  getRowsData('income-tbody','name'),     INCOME_COLORS);
+  drawPie('expense-pie', 'expense-legend', getRowsData('expense-tbody','category'), EXPENSE_COLORS);
+}
+
+function renderExpChart() {
+  var pieWrap  = document.getElementById('exp-pie-wrap');
+  var listWrap = document.getElementById('exp-list-wrap');
+
+  if (expTabMode === 'list') {
+    pieWrap.style.display  = 'none';
+    listWrap.style.display = 'block';
+    renderExpList();
+  } else {
+    pieWrap.style.display  = 'flex';
+    listWrap.style.display = 'none';
+    // Category view: group by category
+    var items = getRowsData('expense-tbody', 'category');
+    drawPie('expense-pie', 'expense-legend', items, EXPENSE_COLORS, expTabMode === 'category-amt');
+  }
+}
+
+function renderExpList() {
+  var list = document.getElementById('expense-list');
+  // Get all individual expense rows (not grouped)
+  var items = [];
+  document.querySelectorAll('#expense-tbody tr').forEach(function(tr) {
+    var cat = tr.querySelector('[data-field="category"]').value || 'Uncategorised';
+    var exp = tr.querySelector('[data-field="expense"]').value || '—';
+    var v   = parseFloat(tr.querySelector('[data-period="yearly"]').value);
+    if (!isNaN(v) && v > 0) items.push({ cat: cat, exp: exp, value: v });
+  });
+  if (!items.length) { list.innerHTML = '<div class="no-data-msg">No expense data yet</div>'; return; }
+  var total = items.reduce(function(s,d){ return s+d.value; }, 0);
+  // Sort by value desc
+  items.sort(function(a,b){ return b.value - a.value; });
+  var html = '';
+  items.forEach(function(item, i) {
+    var pct   = Math.round(item.value / total * 100);
+    var color = EXPENSE_COLORS[i % EXPENSE_COLORS.length];
+    var barW  = Math.max(pct, 2);
+    html += '<div class="exp-list-item">'
+      + '<div class="exp-list-dot" style="background:'+color+'"></div>'
+      + '<span class="exp-list-name" title="'+escHtml(item.cat)+' — '+escHtml(item.exp)+'">'+escHtml(item.exp)+'</span>'
+      + '<div class="exp-list-bar-wrap"><div class="exp-list-bar" style="width:'+barW+'%;background:'+color+'"></div></div>'
+      + '<span class="exp-list-amt">'+fmtMoney(item.value)+'</span>'
+      + '<span class="exp-list-pct">'+pct+'%</span>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+// ── Sort ──────────────────────────────────────────────────────────
+function sortSection(section, col) {
+  var tbodyId=section+'-tbody', state=section==='income'?incomeSort:expenseSort, prefix=section==='income'?'isa':'esa';
+  if (state.col===col) state.dir*=-1; else { state.col=col; state.dir=1; }
+  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(function(el){ el.textContent=''; });
+  var el=document.getElementById(prefix+'-'+col); if(el) el.textContent=state.dir===1?'↑':'↓';
+  var tbody=document.getElementById(tbodyId), trs=Array.from(tbody.querySelectorAll('tr'));
+  trs.sort(function(a,b){
+    var ai=a.querySelector('[data-field="'+col+'"]'), bi=b.querySelector('[data-field="'+col+'"]');
+    var av=(ai?ai.value:'').toLowerCase(), bv=(bi?bi.value:'').toLowerCase();
+    return av<bv?-state.dir:av>bv?state.dir:0;
+  });
+  trs.forEach(function(tr){ tbody.appendChild(tr); });
+}
+
+// ── Clear ─────────────────────────────────────────────────────────
+function clearSection(section) {
+  var tbodyId=section+'-tbody';
+  if (!document.querySelectorAll('#'+tbodyId+' tr').length) return;
+  if (!confirm('Clear all '+section+' rows?')) return;
+  document.getElementById(tbodyId).innerHTML=''; updateAll();
+}
+
+// ── Save / Load ───────────────────────────────────────────────────
+function gatherSection(tbodyId, c1, c2) {
+  var rows=[];
+  document.querySelectorAll('#'+tbodyId+' tr').forEach(function(tr){
+    var row={src:tr.dataset.source};
+    row[c1]=tr.querySelector('[data-field="'+c1+'"]').value;
+    row[c2]=tr.querySelector('[data-field="'+c2+'"]').value;
+    PERIODS.forEach(function(p){ row[p]=tr.querySelector('[data-period="'+p+'"]').value; });
+    rows.push(row);
+  }); return rows;
+}
+
+// ── Client name helpers ──────────────────────────────────────────
+function updateDocTitle() {
+  var first = (document.getElementById('client-first').value || '').trim();
+  var last  = (document.getElementById('client-last').value  || '').trim();
+  var name  = [first, last].filter(Boolean).join(' ');
+  document.title = name ? name + ' — Budget' : 'Budget Planner';
+}
+
+function getFilename() {
+  var last  = (document.getElementById('client-last').value  || '').trim();
+  var first = (document.getElementById('client-first').value || '').trim();
+  var surname = last || first || 'Budget';
+  var now  = new Date();
+  var date = now.getFullYear() + '-'
+    + String(now.getMonth()+1).padStart(2,'0') + '-'
+    + String(now.getDate()).padStart(2,'0');
+  return surname.toUpperCase() + ' - Budget ' + date + '.html';
+}
+
+// Save/Load handled by app.js
+
+/* __BUDGET_DATA_START__ */
+// ── Seed data (replaced on Save) ──────────────────────────────────
+addIncomeRow({ name:'John', type:'Salary',    fortnightly:3800 });
+addIncomeRow({ name:'Jane', type:'Salary',    fortnightly:2600 });
+
+addExpenseRow({ category:'Housing',   expense:'Rent / Mortgage',  monthly:2200 });
+addExpenseRow({ category:'Utilities', expense:'Electricity',       monthly:150  });
+addExpenseRow({ category:'Food',      expense:'Groceries',         weekly:200   });
+addExpenseRow({ category:'Transport', expense:'Fuel',              fortnightly:80 });
+addExpenseRow({ category:'Insurance', expense:'Health Insurance',  monthly:120  });
+/* __BUDGET_DATA_END__ */
+
+// ── Tab switching ─────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('page-'+name).classList.add('active');
+  var tabs = document.querySelectorAll('.tab');
+  for (var i=0; i<tabs.length; i++) {
+    if (tabs[i].getAttribute('onclick') && tabs[i].getAttribute('onclick').indexOf("'"+name+"'") !== -1) {
+      tabs[i].classList.add('active'); break;
+    }
+  }
+}
+
+// ── Cash Flow Diagram ─────────────────────────────────────────────
+function getExpenseCategories() {
+  var groups = {}, order = [];
+  document.querySelectorAll('#expense-tbody tr').forEach(function(tr) {
+    var cat = tr.querySelector('[data-field="category"]').value.trim() || 'Uncategorised';
+    var exp = tr.querySelector('[data-field="expense"]').value.trim();
+    var yr  = parseFloat(tr.querySelector('[data-period="yearly"]').value) || 0;
+    if (!groups[cat]) { groups[cat] = { category:cat, items:[], total:0 }; order.push(cat); }
+    if (exp) groups[cat].items.push(exp);
+    groups[cat].total += yr;
+  });
+  return order.map(function(k){ return groups[k]; });
+}
+
+function getIncomeNames() {
+  var names = [];
+  document.querySelectorAll('#income-tbody tr').forEach(function(tr) {
+    var n = tr.querySelector('[data-field="name"]').value.trim();
+    if (n) names.push(n);
+  });
+  return names;
+}
+
+// Keywords that indicate an investment property / extra loan category
+// Detect investment property categories
+// Exact-match list (whole category name) OR prefix/keyword match
+var IP_EXACT   = ['ip','i.p','inv','investment property','investment loan'];
+var IP_CONTAIN = ['investment','inv loan','inv property','rental property','property loan','home loan #','home loan 2','second loan','ip loan','ip expense','ip cost'];
+function isIPCat(cat) {
+  var c = cat.toLowerCase().trim();
+  // Exact match (whole word)
+  if (IP_EXACT.indexOf(c) !== -1) return true;
+  // Starts with "ip " or "inv "
+  if (c.match(/^ip[\s\-_#]/)) return true;
+  if (c.match(/^inv[\s\-_#]/)) return true;
+  // Contains any keyword
+  return IP_CONTAIN.some(function(k){ return c.indexOf(k) !== -1; });
+}
+
+function drawCashFlow() {
+  var canvas = document.getElementById('cashflow-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  var allCats     = getExpenseCategories();
+  var DPR         = window.devicePixelRatio || 1;
+
+  var leftCats  = allCats.filter(function(c){ return !isIPCat(c.category); });
+  var rightCats = allCats.filter(function(c){ return  isIPCat(c.category); });
+  var hasIP     = rightCats.length > 0;
+
+  // ── Compact design constants ───────────────────────────────────
+  var BOX_W  = 110, BOX_H  = 52;   // smaller boxes
+  var COLS   = 2;                    // 2-column grid for offset boxes
+  var HGAP   = 10;                   // gap between the 2 columns of boxes
+  var VGAP   = 10;                   // vertical gap between rows
+  var HOUSE_W = 140, HOUSE_H = 105;
+  var PAD     = 30;
+  var MID_GAP = 60;                  // gap between offset grid and house
+
+  // Grid metrics for left offsets
+  var lCols  = leftCats.length > 0 ? Math.min(COLS, leftCats.length) : 1;
+  var lRows  = leftCats.length > 0 ? Math.ceil(leftCats.length / lCols) : 0;
+  var gridW  = lCols * BOX_W + (lCols - 1) * HGAP;
+  var lGridH = lRows > 0 ? lRows * BOX_H + (lRows - 1) * VGAP : 0;
+
+  // Grid metrics for right (IP) offsets
+  var rCols  = rightCats.length > 0 ? Math.min(COLS, rightCats.length) : 1;
+  var rRows  = rightCats.length > 0 ? Math.ceil(rightCats.length / rCols) : 0;
+  var rGridW = rCols * BOX_W + (rCols - 1) * HGAP;
+  var rGridH = rRows > 0 ? rRows * BOX_H + (rRows - 1) * VGAP : 0;
+
+  // ── X positions ───────────────────────────────────────────────
+  // Each IP category gets its own investment house spaced horizontally
+  var INV_GAP    = 30;   // gap between investment houses
+  var invBlockW  = hasIP ? rightCats.length * HOUSE_W + (rightCats.length - 1) * INV_GAP : 0;
+
+  var leftGridX  = PAD;
+  var houseX     = leftGridX + gridW + MID_GAP;
+  var houseCX    = houseX + HOUSE_W / 2;
+  var rightGridX = houseX + HOUSE_W + MID_GAP;
+  var invStartX  = hasIP ? rightGridX + rGridW + MID_GAP : 0;
+  // Wages centred under OO house, credit card stacked below wages
+  var wagesX     = houseCX - BOX_W / 2;
+  var ccX        = houseCX - BOX_W / 2;
+  var totalW     = Math.max(
+    houseX + HOUSE_W + PAD,
+    hasIP ? invStartX + invBlockW + PAD : 0,
+    wagesX + BOX_W + PAD
+  );
+
+  // ── Y positions ───────────────────────────────────────────────
+  var wagesGap  = 44;
+  var mainH     = Math.max(lGridH, HOUSE_H, hasIP ? Math.max(rGridH, HOUSE_H) : 0);
+  var totalH    = PAD + mainH + wagesGap + BOX_H + VGAP + BOX_H + PAD * 2;
+  totalH        = Math.max(totalH, 340);
+
+  var houseCY    = PAD + mainH / 2;
+  var leftGridY  = houseCY - lGridH / 2;
+  var rightGridY = houseCY - rGridH / 2;
+
+  var wagesY     = houseCY + HOUSE_H / 2 + wagesGap;
+  var ccY        = wagesY + BOX_H + VGAP;
+
+  // Wall mid-points
+  var bodyTop      = houseCY - HOUSE_H/2 + HOUSE_H * 0.36;
+  var bodyBot      = houseCY + HOUSE_H/2;
+  var wallMidY     = (bodyTop + bodyBot) / 2;
+  var ooLeftX      = houseX;
+  var ooRightX     = houseX + HOUSE_W;
+
+  // ── Canvas setup ──────────────────────────────────────────────
+  canvas.width        = totalW * DPR;
+  canvas.height       = totalH * DPR;
+  canvas.style.width  = totalW + 'px';
+  canvas.style.height = totalH + 'px';
+  ctx.scale(DPR, DPR);
+  ctx.clearRect(0, 0, totalW, totalH);
+  // White base
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, totalW, totalH);
+  // Subtle dot grid
+  ctx.fillStyle = 'rgba(148,163,184,0.25)';
+  var dotStep = 22;
+  for (var gx = dotStep; gx < totalW; gx += dotStep) {
+    for (var gy = dotStep; gy < totalH; gy += dotStep) {
+      ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── Palette ───────────────────────────────────────────────────
+  var C_TEAL   = '#0d9488', C_PURPLE = '#7c3aed', C_NAVY = '#0f172a';
+  var C_TEXT   = '#0f172a', C_TEXT2  = '#64748b', C_BG = '#ffffff';
+  var COLORS   = ['#0d9488','#2563eb','#7c3aed','#d97706','#db2777',
+                  '#0891b2','#16a34a','#9333ea','#ea580c','#475569'];
+
+  // hex to rgba helper
+  function hexA(hex, a) {
+    var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+
+  // Drop shadow helper
+  function shadow(blur, col) {
+    ctx.shadowBlur   = blur;
+    ctx.shadowColor  = col || 'rgba(15,23,42,0.15)';
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = blur * 0.4;
+  }
+  function noShadow() {
+    ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+    ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+  }
+
+  // Rounded rect path only
+  function rrPath(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  }
+
+  // Styled offset box — tinted fill, bold border, number pill, label
+  function drawBox(bx, by, w, h, col, numLabel, catLabel) {
+    var r = 8;
+    // Shadow
+    shadow(10, hexA(col, 0.2));
+    rrPath(bx, by, w, h, r);
+    ctx.fillStyle = C_BG; ctx.fill();
+    noShadow();
+    // Tinted fill strip at top
+    var grad = ctx.createLinearGradient(bx, by, bx, by+h);
+    grad.addColorStop(0, hexA(col, 0.1));
+    grad.addColorStop(1, hexA(col, 0.02));
+    rrPath(bx, by, w, h, r);
+    ctx.fillStyle = grad; ctx.fill();
+    // Border
+    rrPath(bx, by, w, h, r);
+    ctx.strokeStyle = col; ctx.lineWidth = 1.8; ctx.stroke();
+    // Top accent bar
+    ctx.beginPath();
+    ctx.moveTo(bx+r, by); ctx.lineTo(bx+w-r, by);
+    ctx.quadraticCurveTo(bx+w, by, bx+w, by+r);
+    ctx.lineTo(bx+w, by+5);
+    ctx.lineTo(bx, by+5);
+    ctx.lineTo(bx, by+r);
+    ctx.quadraticCurveTo(bx, by, bx+r, by);
+    ctx.closePath();
+    ctx.fillStyle = col; ctx.fill();
+    // Number pill label at top-left
+    ctx.font = 'bold 7px system-ui,sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'left';
+    ctx.fillText(numLabel, bx + 7, by + 13.5);
+    // Category name
+    ctx.fillStyle = C_TEXT;
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 9.5px system-ui,sans-serif';
+    ctx.fillText(catLabel, bx + w/2, by + h/2 + 6);
+  }
+
+  // Styled house — filled roof gradient, body with tint, name inside
+  function drawHouse(cx, cy, w, h, col, l1, l2) {
+    var rh = h*0.38, bh = h - rh;
+    var x = cx - w/2, y = cy - h/2;
+    var bodyY = y + rh;
+
+    // Body shadow
+    shadow(14, hexA(col, 0.18));
+    ctx.beginPath(); ctx.rect(x, bodyY, w, bh);
+    ctx.fillStyle = C_BG; ctx.fill();
+    noShadow();
+
+    // Body tinted fill
+    var bg = ctx.createLinearGradient(x, bodyY, x, bodyY+bh);
+    bg.addColorStop(0, hexA(col, 0.08));
+    bg.addColorStop(1, hexA(col, 0.02));
+    ctx.beginPath(); ctx.rect(x, bodyY, w, bh);
+    ctx.fillStyle = bg; ctx.fill();
+
+    // Body border
+    ctx.beginPath(); ctx.rect(x, bodyY, w, bh);
+    ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
+
+    // Roof filled
+    var roofGrad = ctx.createLinearGradient(cx, y, cx, bodyY);
+    roofGrad.addColorStop(0, hexA(col, 0.9));
+    roofGrad.addColorStop(1, hexA(col, 0.55));
+    ctx.beginPath();
+    ctx.moveTo(x - 6, bodyY);
+    ctx.lineTo(cx, y);
+    ctx.lineTo(x + w + 6, bodyY);
+    ctx.closePath();
+    ctx.fillStyle = roofGrad; ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
+
+    // Chimney hint
+    ctx.fillStyle = col;
+    ctx.fillRect(cx + w*0.18, y + 4, 8, rh*0.35);
+
+    // Text in body
+    var tcy = bodyY + bh/2;
+    ctx.textAlign = 'center';
+    if (l2) {
+      ctx.font = 'bold 10px system-ui,sans-serif';
+      ctx.fillStyle = col;
+      ctx.fillText(l1, cx, tcy - 7);
+      ctx.font = '9px system-ui,sans-serif';
+      ctx.fillStyle = hexA(col, 0.75);
+      ctx.fillText(l2, cx, tcy + 6);
+    } else {
+      ctx.font = 'bold 10.5px system-ui,sans-serif';
+      ctx.fillStyle = col;
+      ctx.fillText(l1, cx, tcy + 4);
+    }
+  }
+
+  // Connector line — subtle glow + dashed
+  function dashed(x1, y1, x2, y2, col, lw) {
+    // Glow pass
+    ctx.beginPath(); ctx.setLineDash([6,4]);
+    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle = hexA(col, 0.18);
+    ctx.lineWidth = (lw||1.5) * 3.5;
+    ctx.stroke();
+    // Main line
+    ctx.beginPath(); ctx.setLineDash([5,4]);
+    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle = hexA(col, 0.7);
+    ctx.lineWidth = lw || 1.5;
+    ctx.stroke();
+    // Dot at start
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(x1, y1, 2.5, 0, Math.PI*2);
+    ctx.fillStyle = col; ctx.fill();
+    ctx.setLineDash([]);
+  }
+
+  // ══ PASS 1: ALL DASHED LINES (drawn first, behind everything) ══
+
+  // Left offset lines → OO house left wall
+  leftCats.forEach(function(cat, idx) {
+    var col  = COLORS[(idx+1) % COLORS.length];
+    var col_ = Math.floor(idx / lRows);
+    var row_ = idx % lRows;
+    var bx   = leftGridX + col_ * (BOX_W + HGAP);
+    var by   = leftGridY + row_ * (BOX_H  + VGAP);
+    var bcy  = by + BOX_H/2;
+    dashed(bx+BOX_W, bcy, ooLeftX, wallMidY, col, 1.5);
+  });
+
+  // IP offset lines → OO house right wall
+  if (hasIP) {
+    rightCats.forEach(function(cat, idx) {
+      var col  = COLORS[(leftCats.length + idx + 1) % COLORS.length];
+      var col_ = Math.floor(idx / rRows);
+      var row_ = idx % rRows;
+      var bx   = rightGridX + col_ * (BOX_W + HGAP);
+      var by   = rightGridY + row_ * (BOX_H  + VGAP);
+      var bcy  = by + BOX_H/2;
+      dashed(bx, bcy, ooRightX, wallMidY, col, 1.5);
+    });
+  }
+
+  // House → wages line
+  dashed(houseCX, houseCY+HOUSE_H/2, wagesX+BOX_W/2, wagesY, C_PURPLE, 1.5);
+
+  // ══ PASS 2: ALL BOXES AND HOUSES (drawn on top of lines) ══
+
+  // Left offset boxes
+  leftCats.forEach(function(cat, idx) {
+    var col  = COLORS[(idx+1) % COLORS.length];
+    var col_ = Math.floor(idx / lRows);
+    var row_ = idx % lRows;
+    var bx   = leftGridX + col_ * (BOX_W + HGAP);
+    var by   = leftGridY + row_ * (BOX_H  + VGAP);
+    var bcx  = bx + BOX_W/2, bcy = by + BOX_H/2;
+    var cat_ = cat.category.length > 13 ? cat.category.slice(0,12)+'…' : cat.category;
+    drawBox(bx, by, BOX_W, BOX_H, col, 'OFFSET #'+(idx+2), cat_.toUpperCase());
+  });
+
+  // OO house
+  drawHouse(houseCX, houseCY, HOUSE_W, HOUSE_H, C_TEAL, 'HOME LOAN', 'OWNER OCCUPIED');
+
+  // IP offset boxes + investment houses
+  if (hasIP) {
+    // IP offset boxes
+    rightCats.forEach(function(cat, idx) {
+      var col  = COLORS[(leftCats.length + idx + 1) % COLORS.length];
+      var col_ = Math.floor(idx / rRows);
+      var row_ = idx % rRows;
+      var bx   = rightGridX + col_ * (BOX_W + HGAP);
+      var by   = rightGridY + row_ * (BOX_H  + VGAP);
+      var bcx  = bx + BOX_W/2, bcy = by + BOX_H/2;
+      var cat_ = cat.category.length > 13 ? cat.category.slice(0,12)+'…' : cat.category;
+      drawBox(bx, by, BOX_W, BOX_H, col, 'OFFSET #'+(leftCats.length+idx+2), cat_.toUpperCase());
+    });
+
+    // Investment houses (one per IP category)
+    rightCats.forEach(function(cat, idx) {
+      var col   = COLORS[(leftCats.length + idx + 1) % COLORS.length];
+      var invCX = invStartX + idx * (HOUSE_W + INV_GAP) + HOUSE_W / 2;
+      var nameParts = cat.category.split(' ');
+      var l1 = nameParts.slice(0, Math.ceil(nameParts.length/2)).join(' ');
+      var l2 = nameParts.slice(Math.ceil(nameParts.length/2)).join(' ');
+      if (cat.category.length <= 12) { l1 = cat.category; l2 = ''; }
+      drawHouse(invCX, houseCY, HOUSE_W, HOUSE_H, col,
+        l1.length > 14 ? l1.slice(0,13)+'…' : l1,
+        l2.length > 14 ? l2.slice(0,13)+'…' : l2);
+    });
+  }
+
+  // Wages offset
+  drawBox(wagesX, wagesY, BOX_W, BOX_H, COLORS[0], 'OFFSET #1', 'WAGES');
+
+  // Credit / Debit Card
+  drawBox(ccX, ccY, BOX_W, BOX_H, C_PURPLE, 'CARD', 'CREDIT / DEBIT');
+}
+
+// Hook into tab switching to redraw
+var _origSwitchTab = switchTab;
+switchTab = function(name) {
+  _origSwitchTab(name);
+  if (name === 'page2') { setTimeout(drawCashFlow, 50); }
+};
+
+// Also redraw when expense rows change
+var _origUpdateAll = updateAll;
+updateAll = function() {
+  _origUpdateAll();
+  var p2 = document.getElementById('page-page2');
+  if (p2 && p2.classList.contains('active')) drawCashFlow();
+};
+
+</script>
+</div><!-- end app-body -->
+</body>
+</html>
